@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { PostCard, Container } from '../components'
 import services from '../appwrite/config'
-import { set } from 'react-hook-form'
 
 
 function Home() {
@@ -18,15 +17,12 @@ function Home() {
 
     if (posts.length === 0) {
         return (
-            <div className="w-full py-8 mt-4 text-center">
+            <div className="w-full py-16 text-center">
                 <Container>
-                    <div className="flex flex-wrap">
-                        <div className="p-2 w-full">
-                            <h1 className="text-2xl font-bold hover:text-gray-500">
-                                Login to read posts
-                            </h1>
-                        </div>
-                    </div>
+                    <h1 className="text-3xl font-semibold tracking-tight text-gray-800">Welcome to the blog</h1>
+                    <p className="mt-2 text-gray-600">No posts yet. {" "}
+                        <span className="font-medium">Login</span> to create or view posts.
+                    </p>
                 </Container>
             </div>
         )
@@ -35,15 +31,14 @@ function Home() {
     return (
         <div className='w-full py-8'>
             <Container>
-                {posts.map((post)=>(
-                    <div className='p-2 w-1/4' key={post.$id}>
-                        <PostCard {...post} />
-                    </div>
-                ))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {posts.map((post) => (
+                        <PostCard key={post.$id} {...post} />
+                    ))}
+                </div>
             </Container>
         </div>
     )
-
 
 
 

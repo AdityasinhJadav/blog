@@ -9,33 +9,36 @@ import { Outlet } from 'react-router-dom'
 
 
 function App() {
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const dispatch = useDispatch()
 
-  useEffect(()=>{
+  useEffect(() => {
     authservice.getCurrentUser()
-    .then ((userData)=>{
-      if (userData){
-        dispatch(login({userData}))
-      }
-      else{
+      .then((userData) => {
+        if (userData) {
+          console.log("User data found:", userData);
+          dispatch(login(userData))
+        } else {
+          console.log("No user data found");
+          dispatch(logout())
+        }
+      })
+      .catch((error) => {
+        console.error("Auth error:", error);
         dispatch(logout())
-      }
-    })
-    .finally(()=>(setLoading(false)))
-  }
-  ,[])
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [])
 
   return !loading ? (
-    <div className="min-h-screen flex flex-wrap content-between bg-gray-400">
-      <div className='w-full block'>
-        <Header/>
-        <main>
-         TODO:
-         <Outlet/>
-        </main>
-        <Footer/>
-      </div>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-gray-50">
+      <Header/>
+      <main className="flex-1 py-6">
+        <Outlet/>
+      </main>
+      <Footer/>
     </div>
   ) : null
 

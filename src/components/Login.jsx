@@ -12,27 +12,42 @@ function Login() {
     const [error, setError] = useState('')
     const { register, handleSubmit } = useForm()
 
-    const login = async (data) => {
-        try {
-            setError('')
-            const session = await authservice.login(data)
-            if (session) {
-                const userData = await authservice.getCurrentUser()
-                if (userData) dispatch(authLogin(userData))
-                navigate('/')
-            }
+    const [isLoading, setIsLoading] = useState(false);
 
+    const login = async (data) => {
+        if (isLoading) return;
+
+        try {
+            setIsLoading(true);
+            setError('');
+            console.log('Attempting login...');
+            
+            const session = await authservice.login(data);
+            if (session) {
+                console.log('Session created, getting user data...');
+                const userData = await authservice.getCurrentUser();
+                if (userData) {
+                    console.log('Login successful, redirecting...');
+                    dispatch(authLogin(userData));
+                    navigate('/');
+                } else {
+                    setError('Failed to get user data');
+                }
+            }
         } catch (error) {
-            setError(error.message)
+            console.error('Login error:', error);
+            setError(error.message || 'Failed to login. Please check your credentials.');
+        } finally {
+            setIsLoading(false);
         }
     }
 
 
     return (
         <div className='flex items-center justify-center w-full'>
-            <div className={`mx-auto w-full max-w-full bg-gray-100 rounded-xl p-10 border-balck/10`}>
+            <div className={`mx-auto w-full max-w-md sm:max-w-lg bg-gray-100 rounded-xl p-8 sm:p-10 border border-gray-200 shadow-sm`}>
                 <div className='mb-2 flex justify-center'>
-                    <span className='inline-block w-full max-w-[100px] '>
+                    <span className='inline-block w-full max-w-[80px] sm:max-w-[100px] '>
                         <Logo width='100%' />
                     </span>
                 </div>
@@ -52,10 +67,10 @@ function Login() {
                     <div className='space-y-5'>
                         <Input
                             type="email"
-                            placeholder="Enater your mail"
+                            placeholder="Enter your email"
                             label="Email: "
                             {...register("email", {
-                                required: true,
+                                required: "Email is required",
                                 validate: {
                                     matchPattern: (value) => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) || "Email address must be valid",
                                 }
@@ -70,8 +85,9 @@ function Login() {
                         <Button
                             type='submit'
                             className='w-full'
+                            disabled={isLoading}
                         >
-                            Sign in
+                            {isLoading ? 'Signing in...' : 'Sign in'}
                         </Button>
 
                     </div>
